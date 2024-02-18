@@ -190,9 +190,9 @@ func New(opts ...Option) (*Manager, error) {
 				redis.WithMaxIdle(opt.redisConfig.MaxIdle),
 				redis.WithDB(opt.redisConfig.DB),
 			)
+		} else {
+			return nil, errors.New("Redis Can't be Null ")
 		}
-	} else {
-		return nil, errors.New("Redis Can't be Null ")
 	}
 
 	return &Manager{
