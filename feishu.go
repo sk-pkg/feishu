@@ -232,10 +232,11 @@ func (m *Manager) getAppToken() (string, error) {
 
 // SendMsg 给指定飞书用户发送消息
 // feishuID 飞书user_id
-// msgType 飞书消息类型，可选值有text
+// msgType 飞书消息类型，可选值有text（文本）、interactive（消息卡片）
 // content 飞书消息内容
 // TODO 支持发送其他类型消息
-func (m *Manager) SendMsg(feishuID, msgType, content string) error {
+func (m *Manager) SendMsg(feishuID, msgType string, content any) error {
+	var marshal []byte
 	token, err := m.getAppToken()
 	if err != nil {
 		m.logger.Error("failed to get feishu token", zap.Error(err))
@@ -246,11 +247,12 @@ func (m *Manager) SendMsg(feishuID, msgType, content string) error {
 
 	switch msgType {
 	case "text":
-		marshal, _ := json.Marshal(map[string]string{"text": content})
-		content = string(marshal)
+		marshal, _ = json.Marshal(map[string]any{"text": content})
+	case "interactive":
+		marshal, _ = json.Marshal(content)
 	}
 
-	params["content"] = content
+	params["content"] = string(marshal)
 
 	rs := &Result{}
 	client := resty.New()
