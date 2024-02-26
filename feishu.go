@@ -105,6 +105,14 @@ type (
 		Code int    `json:"code"`
 		Msg  string `json:"msg"`
 	}
+
+	CardData struct {
+		Type string `json:"type"`
+		Data struct {
+			TemplateID       string `json:"template_id"`
+			TemplateVariable any    `json:"template_variable"`
+		} `json:"data"`
+	}
 )
 
 func WithRedisConfig(cfg *RedisConfig) Option {
@@ -228,6 +236,21 @@ func (m *Manager) getAppToken() (string, error) {
 	}
 
 	return token, err
+}
+
+// sendCardTemplateMessage 给指定飞书用户发送卡片模板消息
+// TemplateID 模板 ID
+// feishuID 飞书user_id
+// content 模板内容
+func (m *Manager) sendCardTemplateMessage(TemplateID, feishuID string, content any) {
+	msg := &CardData{Type: "template"}
+	msg.Data.TemplateID = TemplateID
+	msg.Data.TemplateVariable = content
+
+	err := m.SendMsg(feishuID, "interactive", msg)
+	if err != nil {
+		m.logger.Error("Send CardTemplateMessage failed", zap.Error(err))
+	}
 }
 
 // SendMsg 给指定飞书用户发送消息
