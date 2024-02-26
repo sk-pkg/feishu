@@ -238,11 +238,11 @@ func (m *Manager) getAppToken() (string, error) {
 	return token, err
 }
 
-// sendCardTemplateMessage 给指定飞书用户发送卡片模板消息
+// SendCardTemplateMessage 给指定飞书用户发送卡片模板消息
 // TemplateID 模板 ID
 // feishuID 飞书user_id
 // content 模板内容
-func (m *Manager) sendCardTemplateMessage(TemplateID, feishuID string, content any) {
+func (m *Manager) SendCardTemplateMessage(TemplateID, feishuID string, content any) {
 	msg := &CardData{Type: "template"}
 	msg.Data.TemplateID = TemplateID
 	msg.Data.TemplateVariable = content
