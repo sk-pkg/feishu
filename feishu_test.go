@@ -6,14 +6,6 @@ import (
 )
 
 type (
-	CardData struct {
-		Type string `json:"type"`
-		Data struct {
-			TemplateID       string `json:"template_id"`
-			TemplateVariable any    `json:"template_variable"`
-		} `json:"data"`
-	}
-
 	CardAccountList struct {
 		Pin    string `json:"pin"`
 		Remark string `json:"remark"`
@@ -97,4 +89,18 @@ func TestManager_SendMsg(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
+}
+
+func TestManager_GetEventOutboundIpList(t *testing.T) {
+	f, err := newFeishu()
+	if err != nil {
+		t.Error(err)
+	}
+
+	list, err := f.GetEventOutboundIpList()
+	if err != nil {
+		t.Error(err)
+	}
+
+	fmt.Println(list)
 }

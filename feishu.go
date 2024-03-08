@@ -23,6 +23,7 @@ const (
 	userInfo            = "https://open.feishu.cn/open-apis/contact/v3/users/"
 	tokenKey            = "feishu:app:token"
 	messageAPI          = "https://open.feishu.cn/open-apis/im/v1/messages"
+	eventOutboundIpAPI  = "https://open.feishu.cn/open-apis/event/v1/outbound_ip"
 )
 
 type (
@@ -112,6 +113,18 @@ type (
 			TemplateID       string `json:"template_id"`
 			TemplateVariable any    `json:"template_variable"`
 		} `json:"data"`
+	}
+
+	EventOutboundIpResult struct {
+		Code int                 `json:"code"`
+		Msg  string              `json:"msg"`
+		Data EventOutboundIpData `json:"data"`
+	}
+
+	EventOutboundIpData struct {
+		IpList    []string `json:"ip_list"`
+		PageToken string   `json:"page_token"`
+		HasMore   bool     `json:"has_more"`
 	}
 )
 
@@ -211,6 +224,31 @@ func New(opts ...Option) (*Manager, error) {
 		appSecret:    opt.appSecret,
 		encryptKey:   opt.encryptKey,
 	}, nil
+}
+
+// GetEventOutboundIpList 获取事件出口 IP
+func (m *Manager) GetEventOutboundIpList() ([]string, error) {
+	token, err := m.getAppToken()
+	if err != nil {
+		return nil, err
+	}
+
+	rs := &EventOutboundIpResult{}
+	client := resty.New()
+	_, err = client.R().SetHeader("Content-Type", "application/json; charset=utf-8").
+		SetAuthToken(token).SetQueryParam("page_size", "50").
+		SetResult(rs).SetError(rs).Get(eventOutboundIpAPI)
+
+	if err != nil {
+		m.logger.Error("Request Event Outbound Ip HTTP GET Failed", zap.Error(err))
+		return nil, err
+	}
+
+	if rs.Code != 0 {
+		return nil, errors.New(rs.Msg)
+	}
+
+	return rs.Data.IpList, nil
 }
 
 // getAppToken 获取飞书 app_access_token（企业自建应用）
