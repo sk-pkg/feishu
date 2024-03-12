@@ -251,9 +251,12 @@ func (m *Manager) GetEventOutboundIpList() ([]string, error) {
 	return rs.Data.IpList, nil
 }
 
-// getAppToken 获取飞书 app_access_token（企业自建应用）
-func (m *Manager) getAppToken() (string, error) {
-	token, err := m.redis.GetString(tokenKey)
+// GetAppTokenWithTTL 获取飞书 app_access_token 和有效时间（企业自建应用）
+// app_access_token 的最大有效期是 2 小时。
+// 如果在有效期小于 30 分钟的情况下，调用本接口，会返回一个新的 app_access_token，
+// 这会同时存在两个有效的 app_access_token。
+func (m *Manager) GetAppTokenWithTTL() (token string, ttl int, err error) {
+	token, err = m.redis.GetString(tokenKey)
 	if err != nil || token == "" {
 		rs := &appTokenResp{}
 		client := resty.New()
@@ -263,15 +266,25 @@ func (m *Manager) getAppToken() (string, error) {
 
 		if err == nil && rs.Code == 0 {
 			token = rs.AppAccessToken
-			err = m.redis.SetString(tokenKey, token, rs.Expire-100)
+			ttl = rs.Expire - 100
+			err = m.redis.SetString(tokenKey, token, ttl)
 			if err != nil {
 				m.logger.Error("failed to set feishu app access token", zap.Error(err))
 			}
 		} else {
 			m.logger.Error("failed to get feishu app access token", zap.Error(err))
-			return token, errors.New(rs.Msg)
+			return
 		}
+	} else {
+		ttl, err = m.redis.Ttl(tokenKey)
 	}
+
+	return
+}
+
+// getAppToken 获取飞书 app_access_token（企业自建应用）
+func (m *Manager) getAppToken() (string, error) {
+	token, _, err := m.GetAppTokenWithTTL()
 
 	return token, err
 }

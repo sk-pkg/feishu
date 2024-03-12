@@ -104,3 +104,17 @@ func TestManager_GetEventOutboundIpList(t *testing.T) {
 
 	fmt.Println(list)
 }
+
+func TestManager_GetAppTokenWithTTL(t *testing.T) {
+	f, err := newFeishu()
+	if err != nil {
+		t.Error(err)
+	}
+
+	token, ttl, err := f.GetAppTokenWithTTL()
+	if err != nil {
+		t.Error(err)
+	}
+
+	fmt.Println(fmt.Sprintf("Token:%s\nTTL:%d", token, ttl))
+}
