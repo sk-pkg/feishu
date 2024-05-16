@@ -293,7 +293,7 @@ func (m *Manager) getAppToken() (string, error) {
 // TemplateID 模板 ID
 // feishuID 飞书user_id
 // content 模板内容
-func (m *Manager) SendCardTemplateMessage(TemplateID, feishuID string, content any) {
+func (m *Manager) SendCardTemplateMessage(TemplateID, feishuID string, content any) error {
 	msg := &CardData{Type: "template"}
 	msg.Data.TemplateID = TemplateID
 	msg.Data.TemplateVariable = content
@@ -302,6 +302,8 @@ func (m *Manager) SendCardTemplateMessage(TemplateID, feishuID string, content a
 	if err != nil {
 		m.logger.Error("Send CardTemplateMessage failed", zap.Error(err))
 	}
+
+	return err
 }
 
 // SendMsg 给指定飞书用户发送消息
