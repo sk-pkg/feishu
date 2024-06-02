@@ -115,6 +115,11 @@ type (
 		} `json:"data"`
 	}
 
+	CardValue struct {
+		Text        string `json:"text"`
+		ActionValue string `json:"action_value"`
+	}
+
 	EventOutboundIpResult struct {
 		Code int                 `json:"code"`
 		Msg  string              `json:"msg"`
