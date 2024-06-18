@@ -199,7 +199,7 @@ func New(opts ...Option) (*Manager, error) {
 				return nil, err
 			}
 
-			opt.logger = l
+			opt.logger = l.Zap
 		} else {
 			return nil, errors.New("Logger Can't be Null ")
 		}

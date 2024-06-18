@@ -4,7 +4,7 @@ go 1.21
 
 require (
 	github.com/go-resty/resty/v2 v2.11.0
-	github.com/sk-pkg/logger v1.0.0
+	github.com/sk-pkg/logger v1.1.1
 	github.com/sk-pkg/redis v1.0.1
 	go.uber.org/zap v1.26.0
 )
