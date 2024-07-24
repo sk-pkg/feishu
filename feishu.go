@@ -207,7 +207,7 @@ func New(opts ...Option) (*Manager, error) {
 
 	if opt.redis == nil {
 		if opt.redisConfig != nil {
-			opt.redis = redis.New(
+			rds, err := redis.New(
 				redis.WithPrefix(opt.redisConfig.Prefix),
 				redis.WithAddress(opt.redisConfig.Host),
 				redis.WithPassword(opt.redisConfig.Auth),
@@ -216,6 +216,12 @@ func New(opts ...Option) (*Manager, error) {
 				redis.WithMaxIdle(opt.redisConfig.MaxIdle),
 				redis.WithDB(opt.redisConfig.DB),
 			)
+
+			if err != nil {
+				return nil, err
+			}
+
+			opt.redis = rds
 		} else {
 			return nil, errors.New("Redis Can't be Null ")
 		}
